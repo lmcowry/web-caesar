@@ -14,7 +14,7 @@
 
 import webapp2
 import cgi
-from caesar import encrypt, rotate_character, alphabet_position
+import caesar
 
 def escape_html(s):
     return cgi.escape(s, quote = True)
@@ -24,18 +24,15 @@ def escape_html(s):
 
 thecontent = """
 <form method="post">
-    What do you want rot13ed?
+    <h1>Web Caesar</h1>
     <br>
-
-    <label>
+    <label>Rotate by:
+    <input type="number" name="rotvalue" value="%(rotvalue)s"/>
+    </label>
+    <br>
+    <label>Type a message:
     <textarea name="thetext">%(thetext)s</textarea>
     </label>
-
-    <label>
-    <input type="text" name="rotvalue" value="%(rotvalue)s">
-    </label>
-
-    <br>
     <br>
     <input type="submit">
 </form>"""
@@ -46,16 +43,15 @@ class MainPage(webapp2.RequestHandler):
     def write_content(self, thetext="", rotvalue=""):
         self.response.out.write(thecontent % {"thetext": thetext, "rotvalue": rotvalue})
 
-
-
     def get(self):
         self.write_content()
 
     def post(self):
         user_text = self.request.get('thetext')
         user_rot = self.request.get('rotvalue')
-        thenewtext = encrypt(user_text, user_rot)
-        self.write_content(thenewtext, user_rot)
+        thenewtext = caesar.encrypt(user_text, user_rot)
+        escaped_message = cgi.escape(thenewtext)
+        self.write_content(escaped_message, user_rot)
 
 
 
